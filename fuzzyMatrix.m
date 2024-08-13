@@ -64,6 +64,10 @@ classdef fuzzyMatrix < double
     methods
         function obj = fuzzyMatrix(varargin)
             %Constructor for fuzzyMatrix.
+            % 
+            %Automatically clamps all the values to the [0,1] interval.
+            %NaN valies are clamped to 0.
+            %
             %If called with no parameters it creates an empty fuzzyMatrix.
             %If called with one parameter it should be a matrix.
             %If called with two parameters it creates zero filled
@@ -72,32 +76,39 @@ classdef fuzzyMatrix < double
                 case 0
                     data = [];
                 case 1 
-                    if (any(any(varargin{1} > 1))) || (any(any(varargin{1} < 0)))
-                        error('Fuzzy matrix can contain only real numbers in [0,1] interval.')
-                    end
-                    data = varargin{1};
+                    data = min(max(varargin{1}, 0), 1);
                 otherwise
                     data = zeros(varargin{1}, varargin{2});
             end
             
-            obj = obj@double(data); % initialize the base class portion
+            obj = obj@double(data);
         end
+
+        function result = eq(a, b)
+            % Custom eq (==) for fuzzyMatrix using EPS tolerance
+            result = abs(double(a) - double(b)) <= eps;
+        end
+
+        function result = isequal(a, b)
+            % Custom isequal for fuzzyMatrix using EPS tolerance
+            result = all(a == b, 'all');
+        end
+
+        function result = isequaln(a, b)
+            % Custom isequaln for fuzzyMatrix using EPS tolerance
+            result = isequal(a, b);
+        end
+
         function result = plus(a,b)
-            %Override the default plus method from the double class. It
-            %only makes sure that the result will not have elements bigger
-            %than 1
-            result = plus@double(a,b);
-            result = min(result, ones(size(result)));
-            result = fuzzyMatrix(result);
+            %Override the default plus method from the double class.
+            result = fuzzyMatrix(plus@double(a,b));
         end
+
         function result = minus(a,b)
-            %Override the default minus method from the double class. It
-            %only makes sure that the result will not have elements smaller
-            %than 0
-            result = minus@double(a,b);
-            result = max(result, zeros(size(result)));
-            result = fuzzyMatrix(result);
+            %Override the default minus method from the double class.
+            result = fuzzyMatrix(minus@double(a,b));
         end
+        
         function result = fcompose(a,b,op1,op2)
             %A general composing method. It composes two fuzzy matrices
             %with two operations.
@@ -112,9 +123,10 @@ classdef fuzzyMatrix < double
                 end
                 result = fuzzyMatrix(result);
             else
-                error('Inner matrix dimensions must agree.')
+                error('fuzzyMatrix:DimensionMismatch', 'Inner matrix dimensions must agree.');
             end
         end
+        
         function result = maxmin(a,b)
             %Implements 'maxmin' composition.
             result = fcompose(a,b,'max','min');
