@@ -1,14 +1,7 @@
 classdef fuzzyMatrixTest < matlab.mock.TestCase
 
-    methods (TestClassSetup)
-        % Shared setup for the entire test class
-    end
-
-    methods (TestMethodSetup)
-        % Setup for each test
-    end
-
     methods (Test)
+        
         function testEmptyInitialization(testCase)
             % Test initialization without a matrix
             obj = fuzzyMatrix();
@@ -142,4 +135,5 @@ classdef fuzzyMatrixTest < matlab.mock.TestCase
         end
 
     end
+
 end

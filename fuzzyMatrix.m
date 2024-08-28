@@ -62,6 +62,7 @@
 %   American Institute of Physics, ISBN 978-0-7354-0750-9, 2009, 434-350.
 classdef fuzzyMatrix < double
     methods
+
         function obj = fuzzyMatrix(varargin)
             %Constructor for fuzzyMatrix.
             % 
@@ -127,67 +128,82 @@ classdef fuzzyMatrix < double
             end
         end
         
+        function result = not(a)
+            %Implements 'fuzzy negation'
+            result = 1-a;
+        end 
+
         function result = maxmin(a,b)
             %Implements 'maxmin' composition.
             result = fcompose(a,b,'max','min');
         end
+
         function result = minmax(a,b)
             %Implements 'minmax' composition.
             result = fcompose(a,b,'min','max');
         end
+
         function result = maxprod(a,b)
             %Implements 'maxproduct' composition.
             result = fcompose(a,b,'max','times');
         end
+
         function result = minalpha(a,b)
             %Implements 'minalpha' composition.
             result = fcompose(a,b,'min','falpha');
         end
+
+        function result = godel(a,b)
+            %Implements 'godel' composition.
+            result = minalpha(a,b);
+        end
+
         function result = maxepsilon(a,b)
             %Implements 'maxepsilon' composition.
             result = fcompose(a,b,'max','fepsilon');
         end
+
         function result = mindiamond(a,b)
             %Implements 'mindiamond' composition.
             result = fcompose(a,b,'min','fdiamond');
         end
-        function result = godel(a,b)
-            %Implements 'godel' composition.
-            result = fcompose(a,b,'min','falpha');
-        end
+
         function result = goguen(a,b)
             %Implements 'goguen' composition.
-            result = fcompose(a,b,'min','fdiamond');
+            result = mindiamond(a,b);
         end
+
         function result = lukasiewicz(a,b)
             %Implements 'lukasiewicz' composition.
             result = fcompose(a,b,'min','fimpl');
         end
+
         function result = maxlukasiewicz(a,b)
             %Implements  'max - lukasiewicz' composition.
             result = fcompose(a,b,'max','ftnorml');
         end
+
         function result = minprobabilistic(a,b)
             %Implements  'min - probabilistic sum' composition.
             result = fcompose(a,b,'min','fprobabilisticsum');
-         end
-         function result = minbounded(a,b)
+        end
+
+        function result = minbounded(a,b)
             %Implements  'min - bounded sum' composition.
             result = fcompose(a,b,'min','fboundedsum');
-         end
-         function result = maxdelta(a,b)
+        end
+
+        function result = maxdelta(a,b)
             %Implements  'max - delta' composition.
             result = fcompose(a,b,'max','fdelta');
-         end
-         function result = maxgama(a,b)
-            %Implements  'max - gama' composition.
+        end
+
+        function result = maxgama(a,b)
+           %Implements  'max - gama' composition.
             result = fcompose(a,b,'max','fgama');
-         end
-         function result = not(a)
-             %Implements 'fuzzy negation'
-             result = 1-a;
-         end 
-             function result = is_lincomb(type,a,b)
+        end
+
+        function result = is_lincomb(type,a,b)
             %Check for a linear combinations according some composition.
             %First parameter should be composition (ex: 'maxmin' or
             %'minmax');
@@ -208,11 +224,12 @@ classdef fuzzyMatrix < double
                 elseif dim(1)==1
                     b = b';
                 end
-            end;
+            end
             s = fuzzySystem(type,fuzzyMatrix(a),fuzzyMatrix(b));
             s.solve_inverse;
             result = s.x;
         end
+
         function result = is_linindep(a, type, full)
             %Check if a set of vectors (matrix) is linear independent.
             %First parameter is a fuzzyMatrix, second is a compositions.
@@ -242,9 +259,10 @@ classdef fuzzyMatrix < double
                         result = false;
                         return;
                     end
-                end;
-            end;
+                end
+            end
             result = depvectors(1:ii);
         end
+
     end
 end
